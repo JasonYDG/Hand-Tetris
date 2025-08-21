@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4ecdc4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HandTris">
+    <meta name="description" content="Innovative Tetris game with hand gesture control and AI pose recognition technology">
+    
+    <title>HandTris</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS图标 -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+    
+    <!-- Standard icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-192.png">
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="header">
+            <div class="game-title">
+                <div class="title-container">
+                    <h1 class="main-title">
+                        <span class="title-icon">🤲</span> HandTris
+                    </h1>
+                    <div class="title-decoration"></div>
+                </div>
+                <p class="subtitle">
+                    <span class="subtitle-icon">🎯</span>
+                    Intelligent Hand Gesture Recognition · Immersive Gaming Experience
+                </p>
+            </div>
+            <div class="score-board">
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="level">Level: <span id="level">1</span></div>
+                <div class="lines">Lines: <span id="lines">0</span></div>
+            </div>
+        </div>
+
+        <div class="main-game">
+            <div class="left-panel">
+                <video id="input_video" autoplay muted playsinline></video>
+                <canvas id="output_canvas"></canvas>
+                
+                <div class="controls-info">
+                    <h3>Controls:</h3>
+                    <p>🤚 Left hand up - Move left</p>
+                    <p>🤚 Right hand up - Move right</p>
+                    <p>🙌 Both hands up - Rotate once</p>
+                    <p>🤯 Head shake - Fast drop</p>
+                    <p>⏱️ Hold hand - Continuous move</p>
+                    <p><small>💡 Hand must be stable for continuous movement</small></p>
+                </div>
+
+                <div class="debug-info" id="debug-info" style="display: none;">
+                    <h3>Debug Info:</h3>
+                    <div id="debug-content"></div>
+                    <button onclick="toggleDebug()">Hide Debug</button>
+                </div>
+            </div>
+
+            <div class="game-board">
+                <canvas id="tetris-canvas"></canvas>
+            </div>
+
+            <div class="right-panel">
+                <div class="next-piece-section">
+                    <span class="next-label">Next:</span>
+                    <canvas id="next-canvas"></canvas>
+                </div>
+
+                <!-- Leaderboard Section -->
+                <div class="leaderboard">
+                    <h3>🏆 Leaderboard</h3>
+                    <div id="leaderboard-content">
+                        <div class="leaderboard-entry">
+                            <span class="rank">1</span>
+                            <span class="player">Hand Master</span>
+                            <span class="score">10000</span>
+                        </div>
+                        <div class="leaderboard-entry">
+                            <span class="rank">2</span>
+                            <span class="player">Gesture Pro</span>
+                            <span class="score">5000</span>
+                        </div>
+                        <div class="leaderboard-entry">
+                            <span class="rank">3</span>
+                            <span class="player">Wave Control</span>
+                            <span class="score">2500</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button id="start-btn">Restart Game</button>
+            <button id="pause-btn">Pause</button>
+            <button id="camera-btn" style="display: none;">Start Camera</button>
+            <button onclick="toggleDebug()" style="display: none;">Debug Info</button>
+            <button onclick="toggleBGM()">
+                BGM
+                <span class="music-indicator" id="music-indicator"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Touch Controls -->
+    <div class="mobile-controls">
+        <button class="mobile-control-btn" id="mobile-left" data-label="Move Left">←</button>
+        <button class="mobile-control-btn" id="mobile-right" data-label="Move Right">→</button>
+        <button class="mobile-control-btn rotate" id="mobile-rotate" data-label="Rotate">↻</button>
+        <button class="mobile-control-btn drop" id="mobile-drop" data-label="Drop">↓</button>
+    </div>
+
+    <!-- Game Over Leaderboard Modal -->
+    <div id="game-over-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎮 Game Over</h2>
+                <span class="close-modal" id="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="final-score">
+                    <h3>Final Score</h3>
+                    <div class="score-display" id="final-score-display">0</div>
+                </div>
+                <div class="leaderboard-modal">
+                    <h3>🏆 Leaderboard</h3>
+                    <div id="modal-leaderboard-content">
+                        <!-- Leaderboard content will be generated here -->
+                    </div>
+                </div>
+                <div class="auto-restart-info">
+                    <p id="auto-restart-countdown">New game starts in 3 seconds...</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="restart-game-btn" class="modal-btn primary">🔄 Start Now</button>
+                    <button id="close-modal-btn" class="modal-btn secondary">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="mobile-detection.js"></script>
+    <script src="tetris.js"></script>
+    <script src="hand-control.js"></script>
+    <script src="mobile-touch.js"></script>
+    <script src="game.js"></script>
+</body>
+
+</html>

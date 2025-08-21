@@ -1,0 +1,734 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    overflow: hidden;
+    height: 100vh;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hide all scrollbars */
+body::-webkit-scrollbar,
+html::-webkit-scrollbar,
+*::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 0.2rem;
+    width: 100%;
+    flex-shrink: 0;
+    padding: 0.2rem 0;
+}
+
+.game-title {
+    text-align: center;
+    margin-bottom: 0.2rem;
+    position: relative;
+}
+
+.main-title {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-weight: 900;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    text-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.05rem;
+}
+
+.subtitle {
+    font-size: clamp(0.6rem, 1vw, 0.8rem);
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 0.1rem;
+    letter-spacing: 0.03rem;
+}
+
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    font-weight: bold;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.score-board>div {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.6rem;
+    backdrop-filter: blur(10px);
+    border: 0.1rem solid rgba(255, 255, 255, 0.2);
+}
+
+/* --- Main Layout --- */
+.main-game {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: stretch;
+    margin: 0;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.left-panel,
+.right-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 clamp(240px, 18vw, 280px);
+    width: clamp(240px, 18vw, 280px);
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.left-panel::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.left-panel {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#input_video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 0.8rem;
+    border: 0.15rem solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    max-width: 280px;
+}
+
+#output_canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 0.8rem;
+    border: 0.15rem solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.8);
+    max-width: 280px;
+}
+
+.controls-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.6rem;
+    border-radius: 0.6rem;
+    font-size: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+    line-height: 1.3;
+}
+
+.controls-info h3 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: clamp(0.85rem, 1.3vw, 1rem);
+    color: #4ecdc4;
+}
+
+.controls-info p {
+    margin: 0.25rem 0;
+}
+
+.next-piece-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.4rem;
+    border-radius: 0.6rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.next-label {
+    color: #4ecdc4;
+    font-weight: bold;
+    font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+}
+
+#next-canvas {
+    border: 0.1rem solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.4rem;
+    background: rgba(0, 0, 0, 0.8);
+    width: 80px;
+    height: 80px;
+    max-width: 80px;
+    max-height: 80px;
+    image-rendering: pixelated;
+}
+
+.game-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#tetris-canvas {
+    border: 0.25rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.5);
+    display: block;
+    image-rendering: pixelated;
+    /* 最大化游戏画面，充分利用屏幕空间，保持正确的俄罗斯方块比例 (宽:高 = 1:2) */
+    width: auto;
+    height: calc(100vh - 4rem); /* 进一步减少头部占用空间，最大化游戏画面 */
+    max-height: calc(100vh - 4rem);
+    aspect-ratio: 1 / 2;
+    /* 确保在不同屏幕尺寸下都能充分利用空间 */
+    max-width: calc((100vh - 4rem) / 2);
+}
+
+.leaderboard,
+.debug-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.6rem;
+    border-radius: 0.6rem;
+    backdrop-filter: blur(10px);
+    border: 0.1rem solid rgba(255, 255, 255, 0.2);
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.leaderboard-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    margin: 0.2rem 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.4rem;
+    font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.leaderboard-entry:hover {
+    background: rgba(78, 205, 196, 0.2);
+    border-color: rgba(78, 205, 196, 0.3);
+}
+
+.leaderboard-entry .rank {
+    font-weight: bold;
+    color: #4ecdc4;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.leaderboard-entry .player {
+    flex: 1;
+    text-align: left;
+    margin: 0 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leaderboard-entry .score {
+    font-weight: bold;
+    color: #ffcc00;
+    min-width: 4rem;
+    text-align: right;
+}
+
+.leaderboard-entry:nth-child(1) .rank {
+    color: #ffd700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.leaderboard-entry:nth-child(2) .rank {
+    color: #c0c0c0;
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+}
+
+.leaderboard-entry:nth-child(3) .rank {
+    color: #cd7f32;
+    text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
+}
+
+.leaderboard h3 {
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    margin-bottom: 1rem;
+    color: #4ecdc4;
+    text-align: center;
+}
+
+/* --- Game Controls --- */
+.game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+    width: 100%;
+    flex-wrap: wrap;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.game-controls button {
+    padding: 0.4rem 0.8rem;
+    font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+    font-weight: bold;
+    border: none;
+    border-radius: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+    min-width: 70px;
+    max-width: 120px;
+}
+
+.game-controls button:hover {
+    transform: translateY(-0.2rem);
+}
+
+.game-controls button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Mobile-specific controls */
+.mobile-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.mobile-control-btn {
+    padding: 1rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+    color: white;
+    box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.3);
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mobile-control-btn.rotate {
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+}
+
+.mobile-control-btn.drop {
+    background: linear-gradient(45deg, #ffcc00, #ffdb4d);
+}
+
+.mobile-control-btn:active {
+    transform: scale(0.9);
+}
+
+#input_video {
+    display: none !important;
+}
+
+.debug-info {
+    font-size: 0.7rem;
+    color: #ffcc00;
+    display: none !important;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+    margin: auto;
+    padding: 1.5rem;
+    border: 0.05rem solid rgba(255, 255, 255, 0.2);
+    width: 90%;
+    max-width: 30rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.25rem 1.25rem rgba(0, 0, 0, 0.4);
+}
+
+.modal-header h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.score-display {
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: bold;
+    color: #4ecdc4;
+    text-align: center;
+    margin: 1rem 0 1.5rem 0;
+}
+
+.modal-btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 1.25rem;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    transition: all 0.3s ease;
+}
+
+.modal-btn.primary {
+    background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+    color: white;
+}
+
+.modal-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.modal-btn:hover {
+    transform: translateY(-0.1rem);
+    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
+}
+
+/* BGM button styles */
+button[onclick="toggleBGM()"] {
+    position: relative;
+    transition: all 0.3s ease;
+    min-width: 80px;
+    font-weight: bold;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button[onclick="toggleBGM()"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+button[onclick="toggleBGM()"].music-enabled {
+    background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+    color: white;
+}
+
+button[onclick="toggleBGM()"].music-disabled {
+    background: linear-gradient(45deg, #6c757d, #5a6268);
+    color: #adb5bd;
+}
+
+.music-indicator {
+    font-size: 1.2em;
+    margin-left: 5px;
+    transition: all 0.3s ease;
+}
+
+.music-indicator:not(:empty) {
+    animation: musicPulse 2s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Auto-restart countdown styles */
+.auto-restart-info {
+    text-align: center;
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 8px;
+}
+
+#auto-restart-countdown {
+    margin: 0;
+    color: #ffc107;
+    font-size: 0.9em;
+    font-weight: bold;
+    animation: countdownPulse 1s ease-in-out infinite;
+}
+
+@keyframes countdownPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-game {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .left-panel {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+    }
+    
+    #tetris-canvas {
+        height: calc(100vh - 8rem); /* 移动端充分利用屏幕高度 */
+        max-height: calc(100vh - 8rem);
+        max-width: calc((100vh - 8rem) / 2);
+    }
+    
+    .mobile-controls {
+        display: flex !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #tetris-canvas {
+        height: calc(100vh - 10rem); /* 小屏幕设备最大化游戏画面 */
+        max-height: calc(100vh - 10rem);
+        max-width: calc((100vh - 10rem) / 2);
+    }
+}
+
+@media (min-height: 800px) {
+    #tetris-canvas {
+        height: calc(100vh - 3rem); /* 高屏幕设备进一步最大化游戏画面 */
+        max-height: calc(100vh - 3rem);
+        max-width: calc((100vh - 3rem) / 2);
+    }
+}
+
+/* 超宽屏幕适配 */
+@media (min-width: 1400px) {
+    #tetris-canvas {
+        height: calc(100vh - 3rem);
+        max-height: calc(100vh - 3rem);
+        max-width: calc((100vh - 3rem) / 2);
+    }
+}
+
+/* 超高屏幕适配 */
+@media (min-height: 1000px) {
+    #tetris-canvas {
+        height: calc(100vh - 2.5rem); /* 超高屏幕最大化利用 */
+        max-height: calc(100vh - 2.5rem);
+        max-width: calc((100vh - 2.5rem) / 2);
+    }
+}
+
+/* 横屏模式适配 */
+@media (orientation: landscape) and (max-height: 600px) {
+    #tetris-canvas {
+        height: calc(100vh - 2rem); /* 横屏模式最大化游戏画面 */
+        max-height: calc(100vh - 2rem);
+        max-width: calc((100vh - 2rem) / 2);
+    }
+    
+    .game-container {
+        padding: 0.2rem;
+    }
+    
+    .header {
+        margin-bottom: 0.1rem;
+        padding: 0.1rem 0;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-controls {
+        display: none !important;
+    }
+}
+
+@keyframes newRecordGlow {
+    0% {
+        box-shadow: 0 0 10px #4ecdc4;
+    }
+    50% {
+        box-shadow: 0 0 30px #4ecdc4, 0 0 60px #4ecdc4;
+    }
+    100% {
+        box-shadow: 0 0 10px #4ecdc4;
+    }
+}
+/* 
+--- Responsive Design --- */
+@media (max-width: 1024px) {
+    .right-panel {
+        display: none;
+    }
+    
+    .main-game {
+        gap: 0.8rem;
+        max-width: 900px;
+    }
+    
+    .left-panel {
+        flex: 0 0 clamp(220px, 25vw, 280px);
+        width: clamp(220px, 25vw, 280px);
+    }
+}
+
+@media (max-width: 768px) {
+    .left-panel {
+        flex: 0 0 200px;
+        width: 200px;
+        gap: 0.3rem;
+    }
+    
+    .main-game {
+        gap: 0.5rem;
+    }
+    
+    #output_canvas {
+        max-width: 180px;
+    }
+    
+    .controls-info {
+        font-size: 0.7rem;
+        padding: 0.4rem;
+    }
+    
+    .controls-info p {
+        margin: 0.15rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 0.2rem;
+    }
+    
+    .main-game {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .left-panel {
+        flex: none;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        overflow: visible;
+    }
+    
+    #output_canvas {
+        max-width: 150px;
+    }
+    
+    .controls-info {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    #tetris-canvas {
+        height: calc(100vh - 12rem);
+        max-height: calc(100vh - 12rem);
+    }
+}
